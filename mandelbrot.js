@@ -9,7 +9,7 @@ let viewport = {
 
 function getMaxIterations() {
     const width = viewport.xMax - viewport.xMin;
-    // Increase iteration count logarithmically with zoom level
+    // Erhöhe iterations Count basierend auf dem Zoomlevel
     const zoomFactor = Math.max(1, Math.log2(3 / width));
     return Math.floor(100 + zoomFactor * 50);
 }
