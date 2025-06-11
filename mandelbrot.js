@@ -52,6 +52,13 @@ function drawMandelbrot(canvas, ctx, animate=false) {
         }
     }
 
+    function palette(t) {
+        const r = Math.floor(9 * (1 - t) * t * t * t * 255);
+        const g = Math.floor(15 * (1 - t) * (1 - t) * t * t * 255);
+        const b = Math.floor(8.5 * (1 - t) * (1 - t) * (1 - t) * t * 255);
+        return [r, g, b];
+    }
+
     function render(limit) {
         let i = 0;
         for (let k = 0; k < iterations.length; k++) {
@@ -61,8 +68,7 @@ function drawMandelbrot(canvas, ctx, animate=false) {
                 data[i++] = 0;
                 data[i++] = 0;
             } else {
-                const hue = Math.floor(360 * iter / maxIterations);
-                const rgb = hslToRgb(hue / 360, 1, 0.5);
+                const rgb = palette(iter / maxIterations);
                 data[i++] = rgb[0];
                 data[i++] = rgb[1];
                 data[i++] = rgb[2];
@@ -116,11 +122,14 @@ function main() {
     const canvas = document.getElementById("mandelbrotCanvas");
     const ctx = canvas.getContext("2d");
     const animateToggle = document.getElementById("animateToggle");
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
 
     canvas.addEventListener("wheel", function(event) {
-        event.preventDefault(); 
+        event.preventDefault();
         const zoomFactor = 0.9;
-        const scale = event.deltaY < 0 ? zoomFactor : 1 / zoomFactor;   
+        const scale = event.deltaY < 0 ? zoomFactor : 1 / zoomFactor;
         const rect = canvas.getBoundingClientRect();
         const cx = event.clientX - rect.left;
         const cy = event.clientY - rect.top;    
@@ -131,9 +140,33 @@ function main() {
         viewport.xMin = x - newWidth * (cx / canvas.width);
         viewport.xMax = x + newWidth * (1 - cx / canvas.width);
         viewport.yMin = y - newHeight * (cy / canvas.height);
-        viewport.yMax = y + newHeight * (1 - cy / canvas.height);   
+        viewport.yMax = y + newHeight * (1 - cy / canvas.height);
         drawMandelbrot(canvas, ctx, animateToggle.checked);
     });
+
+    canvas.addEventListener("mousedown", (event) => {
+        dragging = true;
+        lastX = event.offsetX;
+        lastY = event.offsetY;
+    });
+
+    canvas.addEventListener("mousemove", (event) => {
+        if (!dragging) return;
+        const dx = event.offsetX - lastX;
+        const dy = event.offsetY - lastY;
+        lastX = event.offsetX;
+        lastY = event.offsetY;
+        const deltaX = dx * (viewport.xMax - viewport.xMin) / canvas.width;
+        const deltaY = dy * (viewport.yMax - viewport.yMin) / canvas.height;
+        viewport.xMin -= deltaX;
+        viewport.xMax -= deltaX;
+        viewport.yMin -= deltaY;
+        viewport.yMax -= deltaY;
+        drawMandelbrot(canvas, ctx, animateToggle.checked);
+    });
+
+    canvas.addEventListener("mouseup", () => { dragging = false; });
+    canvas.addEventListener("mouseleave", () => { dragging = false; });
 
     animateToggle.addEventListener("change", () => {
         drawMandelbrot(canvas, ctx, animateToggle.checked);
