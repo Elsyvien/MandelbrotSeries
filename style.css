@@ -1,3 +1,5 @@
+/* Einfache Styles fuer die Mandelbrot-Demo */
+/* Grundlayout */
 body {
   margin: 0;
   background: radial-gradient(ellipse at center, #222 0%, #000 100%);
@@ -17,6 +19,7 @@ h1 {
   text-shadow: 0 2px 8px #000a;
 }
 
+/* Darstellung des Canvas */
 canvas {
   border-radius: 16px;
   border: 2px solid #fff;
@@ -26,16 +29,19 @@ canvas {
   margin-bottom: 24px;
 }
 
+/* Hover-Effekt */
 canvas:hover {
   box-shadow: 0 12px 48px #00f4, 0 1.5px 0 #fff4 inset;
   border-color: #0ff;
 }
 
+/* Checkbox und Beschriftung */
 .control {
   font-size: 0.9rem;
   margin-bottom: 16px;
 }
 
+/* Zusätzliche Informationen */
 .info {
   margin-top: 8px;
   font-size: 1rem;
