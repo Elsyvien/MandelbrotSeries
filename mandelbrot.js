@@ -2,7 +2,8 @@ function drawMandelbrot(canvas, ctx) {
     const width = canvas.width;
     const height = canvas.height;
     const maxIterations = 100;
-    const zoom = 1;
+    const zoom = 1.0; // Zoomfaktor, kann angepasst werden
+    console.log("Starte Berechnung der Mandelbrot-Menge");
     const imageData = ctx.createImageData(width, height);
     const data = imageData.data;
 
@@ -29,15 +30,17 @@ function drawMandelbrot(canvas, ctx) {
             console.log("Pixel:", px, py, "Iteration:", iteration);
             // Farbe basierend auf der Anzahl der Iterationen
             let color;
-            if (iteration === maxIterations) {
-                color = 0;
-            } else {
-                color = (iteration * 255) / maxIterations;
-            }
             const index = (px + py * width) * 4;
-            data[index] = color;     // Rot
-            data[index + 1] = color; // Grün
-            data[index + 2] = color; // Blau
+            if (iteration === maxIterations) {
+                data[index] = 0;     // Rot
+                data[index + 1] = 0; // Grün
+                data[index + 2] = 0; // Blau
+            } else {
+                // Einfache Farbkombination, z.B. Verlauf
+                data[index] = (iteration * 9) % 256;      // Rot
+                data[index + 1] = (iteration * 7) % 256;  // Grün
+                data[index + 2] = (iteration * 5) % 256; // Blau
+            }
             data[index + 3] = 255;   // Alpha
         }
     }
