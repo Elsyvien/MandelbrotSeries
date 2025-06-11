@@ -1,3 +1,12 @@
+let canvas, ctx;
+
+let viewport = {
+    xMin: -2.0,
+    xMax: 1.0,
+    yMin: -1.5,
+    yMax: 1.5
+};
+
 function drawMandelbrot(canvas, ctx, zoom) {
     const width = canvas.width;
     const height = canvas.height;
@@ -5,17 +14,17 @@ function drawMandelbrot(canvas, ctx, zoom) {
     console.log("Starte Berechnung der Mandelbrot-Menge");
     const imageData = ctx.createImageData(width, height);
     const data = imageData.data;
+    const aspect = width / height;
 
     // Komplexer Zahlenraum
-    const aspect = width / height;
-    const xMin = -2.0 * aspect;
-    const xMax = 1.0 * aspect;
-    const yMin = -1.5;
-    const yMax = 1.5;
+    const xMin = viewport.xMin * aspect;
+    const xMax = viewport.xMax * aspect;
+    const yMin = viewport.yMin;
+    const yMax = viewport.yMax;
 
 
-    for(let px = 0; px < width; px++) {
-        for(let py = 0; py < height; py++) {
+    for (let px = 0; px < width; px++) {
+        for (let py = 0; py < height; py++) {
             // Mappe Pixel auf komplexe Zahl c
             const x0 = xMin + (xMax - xMin) * px / width;
             const y0 = yMin + (yMax - yMin) * py / height;
@@ -75,16 +84,30 @@ function hslToRgb(h, s, l) {
     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
 
-
-
 function main() {
     const canvas = document.getElementById("mandelbrotCanvas");
     const ctx = canvas.getContext("2d");
 
-    drawMandelbrot(canvas, ctx, 1.0);
+    canvas.addEventListener("wheel", function(event) {
+        event.preventDefault(); 
+        const zoomFactor = 0.9;
+        const scale = event.deltaY < 0 ? zoomFactor : 1 / zoomFactor;   
+        const rect = canvas.getBoundingClientRect();
+        const cx = event.clientX - rect.left;
+        const cy = event.clientY - rect.top;    
+        const x = viewport.xMin + (viewport.xMax - viewport.xMin) * (cx / canvas.width);
+        const y = viewport.yMin + (viewport.yMax - viewport.yMin) * (cy / canvas.height);   
+        const newWidth = (viewport.xMax - viewport.xMin) * scale;
+        const newHeight = (viewport.yMax - viewport.yMin) * scale;  
+        viewport.xMin = x - newWidth * (cx / canvas.width);
+        viewport.xMax = x + newWidth * (1 - cx / canvas.width);
+        viewport.yMin = y - newHeight * (cy / canvas.height);
+        viewport.yMax = y + newHeight * (1 - cy / canvas.height);   
+        drawMandelbrot(canvas, ctx);
+    });
+
+
+    drawMandelbrot(canvas, ctx);
 }
-
-
-
 
 window.addEventListener("load", main);
