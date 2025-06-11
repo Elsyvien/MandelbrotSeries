@@ -26,6 +26,7 @@ function drawMandelbrot(canvas, ctx) {
                 x = xTemp;
                 iteration++;
             }
+            console.log("Pixel:", px, py, "Iteration:", iteration);
             // Farbe basierend auf der Anzahl der Iterationen
             let color;
             if (iteration === maxIterations) {
@@ -40,6 +41,7 @@ function drawMandelbrot(canvas, ctx) {
             data[index + 3] = 255;   // Alpha
         }
     }
+    console.log("Fertig mit der Berechnung der Mandelbrot-Menge");
     ctx.putImageData(imageData, 0, 0);
 }
 
