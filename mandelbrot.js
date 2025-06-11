@@ -14,7 +14,7 @@ function getMaxIterations() {
     return Math.floor(100 + zoomFactor * 50);
 }
 
-function drawMandelbrot(canvas, ctx) {
+function drawMandelbrot(canvas, ctx, animate=false) {
     const width = canvas.width;
     const height = canvas.height;
     const maxIterations = getMaxIterations();
@@ -33,10 +33,11 @@ function drawMandelbrot(canvas, ctx) {
     const yScale = (yMax - yMin) / height;
 
 
-    for (let px = 0; px < width; px++) {
-        const x0 = xMin + xScale * px;
-        for (let py = 0; py < height; py++) {
-            // Mappe Pixel auf komplexe Zahl c
+    let row = 0;
+    function drawRow() {
+        const py = row;
+        for (let px = 0; px < width; px++) {
+            const x0 = xMin + xScale * px;
             const y0 = yMin + yScale * py;
             let x = 0;
             let y = 0;
@@ -48,25 +49,38 @@ function drawMandelbrot(canvas, ctx) {
                 iteration++;
             }
             const index = ((py * width) + px) << 2;
-            // Setze Farbe basierend auf der Anzahl der Iterationen
             if (iteration === maxIterations) {
-                // Punkt ist in der Mandelbrot-Menge → schwarz
                 data[index + 0] = 0;
                 data[index + 1] = 0;
                 data[index + 2] = 0;
             } else {
                 const hue = Math.floor(360 * iteration / maxIterations);
-                const rgb = hslToRgb(hue / 360, 1, 0.5); // volle Sättigung, mittlere Helligkeit
-
+                const rgb = hslToRgb(hue / 360, 1, 0.5);
                 data[index + 0] = rgb[0];
                 data[index + 1] = rgb[1];
                 data[index + 2] = rgb[2];
             }
             data[index + 3] = 255;
         }
+
+        row++;
+        if (animate) {
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        if (row < height) {
+            if (animate) {
+                requestAnimationFrame(drawRow);
+            } else {
+                drawRow();
+            }
+        } else {
+            console.log("Fertig mit der Berechnung der Mandelbrot-Menge");
+            ctx.putImageData(imageData, 0, 0);
+        }
     }
-    console.log("Fertig mit der Berechnung der Mandelbrot-Menge");
-    ctx.putImageData(imageData, 0, 0);
+
+    drawRow();
 }
 
 function hslToRgb(h, s, l) {
@@ -97,6 +111,7 @@ function hslToRgb(h, s, l) {
 function main() {
     const canvas = document.getElementById("mandelbrotCanvas");
     const ctx = canvas.getContext("2d");
+    const animateToggle = document.getElementById("animateToggle");
 
     canvas.addEventListener("wheel", function(event) {
         event.preventDefault(); 
@@ -113,11 +128,14 @@ function main() {
         viewport.xMax = x + newWidth * (1 - cx / canvas.width);
         viewport.yMin = y - newHeight * (cy / canvas.height);
         viewport.yMax = y + newHeight * (1 - cy / canvas.height);   
-        drawMandelbrot(canvas, ctx);
+        drawMandelbrot(canvas, ctx, animateToggle.checked);
     });
 
+    animateToggle.addEventListener("change", () => {
+        drawMandelbrot(canvas, ctx, animateToggle.checked);
+    });
 
-    drawMandelbrot(canvas, ctx);
+    drawMandelbrot(canvas, ctx, animateToggle.checked);
 }
 
 window.addEventListener("load", main);
