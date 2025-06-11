@@ -28,6 +28,8 @@ function drawMandelbrot(canvas, ctx, zoom) {
                 x = xTemp;
                 iteration++;
             }
+            const index = (px + py * width) * 4;
+            // Setze Farbe basierend auf der Anzahl der Iterationen
             if (iteration === maxIterations) {
                 // Punkt ist in der Mandelbrot-Menge → schwarz
                 data[index + 0] = 0;
