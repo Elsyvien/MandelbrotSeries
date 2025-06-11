@@ -7,10 +7,17 @@ let viewport = {
     yMax: 1.5
 };
 
-function drawMandelbrot(canvas, ctx, zoom) {
+function getMaxIterations() {
+    const width = viewport.xMax - viewport.xMin;
+    // Increase iteration count logarithmically with zoom level
+    const zoomFactor = Math.max(1, Math.log2(3 / width));
+    return Math.floor(100 + zoomFactor * 50);
+}
+
+function drawMandelbrot(canvas, ctx) {
     const width = canvas.width;
     const height = canvas.height;
-    const maxIterations = 100;  
+    const maxIterations = getMaxIterations();
     console.log("Starte Berechnung der Mandelbrot-Menge");
     const imageData = ctx.createImageData(width, height);
     const data = imageData.data;
@@ -22,12 +29,15 @@ function drawMandelbrot(canvas, ctx, zoom) {
     const yMin = viewport.yMin;
     const yMax = viewport.yMax;
 
+    const xScale = (xMax - xMin) / width;
+    const yScale = (yMax - yMin) / height;
+
 
     for (let px = 0; px < width; px++) {
+        const x0 = xMin + xScale * px;
         for (let py = 0; py < height; py++) {
             // Mappe Pixel auf komplexe Zahl c
-            const x0 = xMin + (xMax - xMin) * px / width;
-            const y0 = yMin + (yMax - yMin) * py / height;
+            const y0 = yMin + yScale * py;
             let x = 0;
             let y = 0;
             let iteration = 0;
@@ -37,7 +47,7 @@ function drawMandelbrot(canvas, ctx, zoom) {
                 x = xTemp;
                 iteration++;
             }
-            const index = (px + py * width) * 4;
+            const index = ((py * width) + px) << 2;
             // Setze Farbe basierend auf der Anzahl der Iterationen
             if (iteration === maxIterations) {
                 // Punkt ist in der Mandelbrot-Menge → schwarz
