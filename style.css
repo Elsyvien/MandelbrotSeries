@@ -1,11 +1,39 @@
 body {
   margin: 0;
-  background: black;
+  background: radial-gradient(ellipse at center, #222 0%, #000 100%);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #eee;
 }
+
+h1 {
+  margin-bottom: 24px;
+  font-size: 2.2rem;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px #000a;
+}
+
 canvas {
-  border: 1px solid white;
+  border-radius: 16px;
+  border: 2px solid #fff;
+  box-shadow: 0 8px 32px #000a, 0 1.5px 0 #fff4 inset;
+  background: #181818;
+  transition: box-shadow 0.3s;
+  margin-bottom: 24px;
+}
+
+canvas:hover {
+  box-shadow: 0 12px 48px #00f4, 0 1.5px 0 #fff4 inset;
+  border-color: #0ff;
+}
+
+.info {
+  margin-top: 8px;
+  font-size: 1rem;
+  opacity: 0.8;
+  text-align: center;
 }
